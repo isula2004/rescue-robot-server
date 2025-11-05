@@ -1,0 +1,17 @@
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+
+app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+@app.route('/')
+def index():
+    return "Robot Server Running!"
+
+@socketio.on('robot_command')
+def handle_robot_command(cmd):
+    print("Robot Command:", cmd)
+    emit('command_ack', f"Received: {cmd}")
+
+if __name__ == "__main__":
+    socketio.run(app, host="0.0.0.0", port=5000)
