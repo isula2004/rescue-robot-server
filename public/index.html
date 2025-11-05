@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disaster Rescue Robot Dashboard</title>
+    <style>
+        body {
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            color: #e0e0e0;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #ffffff;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container {
+            width: 95%;
+            margin: auto;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .video-box {
+            width: 70%;
+            height: 450px;
+            background-color: #1a1a1a;
+            border: 3px solid #1e90ff;
+            border-radius: 6px;
+        }
+        .controls-box {
+            width: 27%;
+            background-color: #111;
+            border: 2px solid #1e90ff;
+            border-radius: 6px;
+            padding: 10px;
+            transition: opacity 0.4s ease;
+        }
+        .disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        button {
+            background-color: #1e90ff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 6px;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            width: 110px;
+        }
+        button:hover {
+            background-color: #0e70d1;
+        }
+        .middle-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        .sensor-box {
+            width: 60%;
+            background-color: #111;
+            border: 2px solid #1e90ff;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: left;
+            padding-left: 20px;
+        }
+        .autopilot-box {
+            width: 35%;
+            background-color: #111;
+            border: 2px solid #1e90ff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .autopilot-button {
+            width: 80%;
+            height: 50px;
+            background-color: #cc0000;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        .map-box {
+            margin-top: 20px;
+            height: 300px;
+            background-color: #1a1a1a;
+            border: 3px solid #1e90ff;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" 
+             width="45" height="45" alt="Robot Icon">
+        Disaster Rescue Robot Dashboard
+    </h1>
+
+    <div class="container">
+
+        <!-- TOP: VIDEO + CONTROLS -->
+        <div class="top-section">
+            <div class="video-box" id="video">
+                <p style="margin-top:210px;">Video Feed</p>
+            </div>
+
+            <div class="controls-box" id="controlBox">
+                <h3>Robot Controls</h3>
+                <button onclick="sendCommand('forward')">Forward</button><br>
+                <button onclick="sendCommand('left')">Left</button>
+                <button onclick="sendCommand('right')">Right</button><br>
+                <button onclick="sendCommand('backward')">Backward</button>
+
+                <h3>Camera Controls</h3>
+                <button onclick="sendCommand('cam_up')">Up</button><br>
+                <button onclick="sendCommand('cam_left')">Left</button>
+                <button onclick="sendCommand('cam_right')">Right</button><br>
+                <button onclick="sendCommand('cam_down')">Down</button>
+            </div>
+        </div>
+
+        <!-- MIDDLE: SENSOR + AUTOPILOT -->
+        <div class="middle-section">
+            <div class="sensor-box">
+                <h3>Sensor Data</h3>
+                <p>Temperature: <span id="temp">--</span></p>
+                <p>Gas Level: <span id="gas">--</span></p>
+                <p>Human Detection: <span id="human">--</span></p>
+            </div>
+
+            <div class="autopilot-box">
+                <button class="autopilot-button" id="autopilotBtn"
+                        onclick="toggleAutopilot()">AUTO PILOT</button>
+            </div>
+        </div>
+
+        <!-- MAP -->
+        <div class="map-box">
+            <p style="margin-top:130px;">Map</p>
+        </div>
+
+    </div>
+
+    <!-- ✅ Required for communication -->
+    <script src="/socket.io/socket.io.js"></script>
+
+<script>
+let socket = io(); 
+let autopilot = false;
+
+// ✅ Send robot control commands to server
+function sendCommand(cmd) {
+    console.log("Sending command: " + cmd);
+    socket.emit("robot-command", cmd);
+}
+
+function toggleAutopilot() {
+    autopilot = !autopilot;
+    let controlPanel = document.getElementById("controlBox");
+    let btn = document.getElementById("autopilotBtn");
+
+    if (autopilot) {
+        controlPanel.classList.add("disabled");
+        btn.textContent = "TAKE CONTROL";
+        btn.style.backgroundColor = "#ff9500";
+        socket.emit("autopilot", true);
+    } else {
+        controlPanel.classList.remove("disabled");
+        btn.textContent = "AUTO PILOT";
+        btn.style.backgroundColor = "#cc0000";
+        socket.emit("autopilot", false);
+    }
+}
+</script>
+
+</body>
+</html>
+
+
