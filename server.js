@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
 });
 
 // use the port assigned by the host (Render) or fallback to 3000 locally
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3030;
 http.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
