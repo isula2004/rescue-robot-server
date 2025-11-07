@@ -98,34 +98,48 @@
             font-size: 18px;
             transition: background-color 0.3s ease;
         }
-        .map-box {
+
+        .map-wrapper {
             margin-top: 20px;
+            display: flex;
+            gap: 15px;
             height: 300px;
+        }
+        .map-box {
+            flex: 1;
             background-color: #1a1a1a;
             border: 3px solid #1e90ff;
             border-radius: 6px;
         }
+        .gps-info {
+            width: 200px;
+            background: #111;
+            border: 2px solid #1e90ff;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+            color: #0f0;
+        }
     </style>
 
-    <!-- ✅ Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 </head>
 
 <body>
 
     <h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" 
-             width="45" height="45" alt="Robot Icon">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png"
+             width="45" height="45">
         Disaster Rescue Robot Dashboard
     </h1>
 
     <div class="container">
 
         <div class="top-section">
-            <div class="video-box" id="video">
-                🚫 ROBOT OFFLINE
-            </div>
+            <div class="video-box" id="video">🚫 ROBOT OFFLINE</div>
 
             <div class="controls-box" id="controlBox">
                 <h3>Robot Controls</h3>
@@ -156,18 +170,25 @@
             </div>
         </div>
 
-        <div class="map-box" id="map"></div>
+        <div class="map-wrapper">
+            <div class="map-box" id="map"></div>
+
+            <div class="gps-info" id="gpsBox">
+                <b>GPS DATA</b><br>
+                Lat: --<br>
+                Lon: --<br>
+                Alt: --<br>
+            </div>
+        </div>
 
     </div>
 
-    <!-- ✅ Socket.IO -->
     <script src="/socket.io/socket.io.js"></script>
 
 <script>
 let socket = io();
 let autopilot = false;
 
-// ✅ Controls
 function sendCommand(cmd) {
     socket.emit("robot-command", cmd);
 }
@@ -190,27 +211,40 @@ function toggleAutopilot() {
 }
 </script>
 
-<!-- ✅ LIVE MAP + SENSOR UPDATES -->
 <script>
-// ✅ Init map centered at Colombo
-let map = L.map('map').setView([6.9271, 79.8612], 14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+// ✅ Init map (Zoom + near real usage)
+let map = L.map('map').setView([6.9271, 79.8612], 19);
 
-let marker = L.marker([6.9271, 79.8612]).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 20,
+}).addTo(map);
+
+let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
 
 // ✅ Receive live robot data
 socket.on("robot-data", (data) => {
+
     document.getElementById("temp").innerText = data.temperature;
     document.getElementById("gas").innerText = data.gas;
     document.getElementById("human").innerText = data.humanDetected;
 
-    marker.setLatLng([data.gps.lat, data.gps.lng]);
-    map.setView([data.gps.lat, data.gps.lng]);
+    const { lat, lng, alt } = data.gps;
+
+    document.getElementById("gpsBox").innerHTML = `
+        <b>GPS DATA</b><br>
+        Lat: ${lat.toFixed(6)}<br>
+        Lon: ${lng.toFixed(6)}<br>
+        Alt: ${alt.toFixed(2)} m
+    `;
+
+    gpsMarker.setLatLng([lat, lng]);
+    map.setView([lat, lng]);
 });
 </script>
 
 </body>
 </html>
+
 
 
 
