@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Disaster Rescue Robot Dashboard</title>
+
     <style>
         body {
             background-color: #000;
@@ -19,12 +20,10 @@
             align-items: center;
             gap: 10px;
         }
-
         .container {
             width: 95%;
             margin: auto;
         }
-
         .top-section {
             display: flex;
             justify-content: space-between;
@@ -101,6 +100,11 @@
             border-radius: 6px;
         }
     </style>
+
+    <!-- ✅ Leaflet (Map Library) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 </head>
 
 <body>
@@ -149,21 +153,19 @@
             </div>
         </div>
 
-        <!-- MAP -->
-        <div class="map-box">
-            <p style="margin-top:130px;">Map</p>
-        </div>
+        <!-- ✅ MAP -->
+        <div class="map-box" id="map"></div>
 
     </div>
 
-    <!-- ✅ Required for communication -->
+    <!-- ✅ Socket.IO -->
     <script src="/socket.io/socket.io.js"></script>
 
 <script>
 let socket = io(); 
 let autopilot = false;
 
-// ✅ Send robot control commands to server
+// ✅ Send robot control commands
 function sendCommand(cmd) {
     console.log("Sending command: " + cmd);
     socket.emit("robot-command", cmd);
@@ -188,7 +190,36 @@ function toggleAutopilot() {
 }
 </script>
 
+<!-- ✅ MAP SCRIPT -->
+<script>
+let map = L.map('map').setView([6.9271, 79.8612], 13); // Colombo center
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap Contributors'
+}).addTo(map);
+
+// ✅ Robot marker (temporary)
+let robotMarker = L.marker([6.9271, 79.8612]).addTo(map);
+robotMarker.bindPopup("Robot Location").openPopup();
+
+// ✅ Update marker on GPS data from server
+socket.on("gps-update", (data) => {
+    robotMarker.setLatLng([data.lat, data.lng]);
+    map.setView([data.lat, data.lng]);
+});
+
+// ✅ Fake GPS movement for testing (remove later)
+let lat = 6.9271;
+let lng = 79.8612;
+setInterval(() => {
+    lat += 0.0005;
+    lng += 0.0005;
+    socket.emit("gps-update", { lat, lng });
+}, 1000);
+</script>
+
 </body>
 </html>
+
 
 
