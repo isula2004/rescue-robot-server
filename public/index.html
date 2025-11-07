@@ -47,7 +47,8 @@
             background-color: #111;
             border: 2px solid #1e90ff;
             border-radius: 6px;
-            padding: 10px;
+            padding: 12px;
+            text-align: center;
             transition: opacity 0.4s ease;
         }
         .disabled {
@@ -63,7 +64,7 @@
             color: white;
             font-size: 15px;
             cursor: pointer;
-            width: 110px;
+            width: 120px;
         }
         button:hover {
             background-color: #0e70d1;
@@ -78,9 +79,8 @@
             background-color: #111;
             border: 2px solid #1e90ff;
             border-radius: 6px;
-            padding: 10px;
+            padding: 10px 20px;
             text-align: left;
-            padding-left: 20px;
         }
         .autopilot-box {
             width: 35%;
@@ -99,91 +99,109 @@
             transition: background-color 0.3s ease;
         }
 
+        /* ✅ New Map + GPS Styles */
         .map-wrapper {
             margin-top: 20px;
             display: flex;
-            gap: 15px;
-            height: 300px;
+            gap: 20px;
+            height: 420px;
         }
         .map-box {
             flex: 1;
             background-color: #1a1a1a;
             border: 3px solid #1e90ff;
-            border-radius: 6px;
+            border-radius: 8px;
         }
         .gps-info {
-            width: 200px;
-            background: #111;
+            width: 260px;
+            background: rgba(20, 20, 20, 0.95);
             border: 2px solid #1e90ff;
-            border-radius: 6px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 15px;
             text-align: left;
-            font-size: 14px;
-            color: #0f0;
+            font-size: 16px;
+            color: #00ff9d;
+            box-shadow: 0 0 10px #1e90ff;
+        }
+        .gps-info h3 {
+            margin-top: 0;
+            color: #00e6ff;
+            text-align: center;
+        }
+        .gps-info p {
+            margin: 8px 0;
+        }
+        .gps-info b {
+            color: #1e90ff;
+        }
+
+        #human {
+            font-weight: bold;
+            font-size: 20px;
         }
     </style>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 </head>
 
 <body>
 
-    <h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png"
-             width="45" height="45">
-        Disaster Rescue Robot Dashboard
-    </h1>
+<h1>
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png"
+         width="45" height="45">
+    Disaster Rescue Robot Dashboard
+</h1>
 
-    <div class="container">
+<div class="container">
 
-        <div class="top-section">
-            <div class="video-box" id="video">🚫 ROBOT OFFLINE</div>
+    <div class="top-section">
+        <div class="video-box" id="video">🚫 ROBOT OFFLINE</div>
 
-            <div class="controls-box" id="controlBox">
-                <h3>Robot Controls</h3>
-                <button onclick="sendCommand('forward')">Forward</button><br>
-                <button onclick="sendCommand('left')">Left</button>
-                <button onclick="sendCommand('right')">Right</button><br>
-                <button onclick="sendCommand('backward')">Backward</button>
+        <div class="controls-box" id="controlBox">
+            <h3>Robot Controls</h3>
+            <button onclick="sendCommand('forward')">Forward</button><br>
+            <button onclick="sendCommand('left')">Left</button>
+            <button onclick="sendCommand('right')">Right</button><br>
+            <button onclick="sendCommand('backward')">Backward</button>
 
-                <h3>Camera Controls</h3>
-                <button onclick="sendCommand('cam_up')">Up</button><br>
-                <button onclick="sendCommand('cam_left')">Left</button>
-                <button onclick="sendCommand('cam_right')">Right</button><br>
-                <button onclick="sendCommand('cam_down')">Down</button>
-            </div>
+            <h3>Camera</h3>
+            <button onclick="sendCommand('cam_up')">Up</button><br>
+            <button onclick="sendCommand('cam_left')">Left</button>
+            <button onclick="sendCommand('cam_right')">Right</button><br>
+            <button onclick="sendCommand('cam_down')">Down</button>
         </div>
-
-        <div class="middle-section">
-            <div class="sensor-box">
-                <h3>Sensor Data</h3>
-                <p>Temperature: <span id="temp">--</span> °C</p>
-                <p>Gas Level: <span id="gas">--</span> %</p>
-                <p>Human Detection: <span id="human">--</span></p>
-            </div>
-
-            <div class="autopilot-box">
-                <button class="autopilot-button" id="autopilotBtn"
-                        onclick="toggleAutopilot()">AUTO PILOT</button>
-            </div>
-        </div>
-
-        <div class="map-wrapper">
-            <div class="map-box" id="map"></div>
-
-            <div class="gps-info" id="gpsBox">
-                <b>GPS DATA</b><br>
-                Lat: --<br>
-                Lon: --<br>
-                Alt: --<br>
-            </div>
-        </div>
-
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <div class="middle-section">
+        <div class="sensor-box">
+            <h3>Sensor Data</h3>
+            <p>Temperature: <span id="temp">--</span> °C</p>
+            <p>Gas Level: <span id="gas">--</span> %</p>
+            <p>Human Detection: <span id="human">--</span></p>
+        </div>
+
+        <div class="autopilot-box">
+            <button class="autopilot-button" id="autopilotBtn"
+                    onclick="toggleAutopilot()">AUTO PILOT</button>
+        </div>
+    </div>
+
+    <!-- ✅ Map + GPS Info -->
+    <div class="map-wrapper">
+        <div class="map-box" id="map"></div>
+
+        <div class="gps-info" id="gpsBox">
+            <h3>📍 GPS DATA</h3>
+            <p><b>Latitude:</b> <span id="lat">--</span></p>
+            <p><b>Longitude:</b> <span id="lon">--</span></p>
+            <p><b>Altitude:</b> <span id="alt">--</span> m</p>
+        </div>
+    </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
 
 <script>
 let socket = io();
@@ -212,33 +230,39 @@ function toggleAutopilot() {
 </script>
 
 <script>
-// ✅ Init map (Zoom + near real usage)
-let map = L.map('map').setView([6.9271, 79.8612], 19);
+// ✅ Init map
+let map = L.map('map').setView([6.9271, 79.8612], 20);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 20,
+    maxZoom: 22,
 }).addTo(map);
 
 let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
+
+// ✅ Optional: Draw the travel path
+let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
 // ✅ Receive live robot data
 socket.on("robot-data", (data) => {
 
     document.getElementById("temp").innerText = data.temperature;
     document.getElementById("gas").innerText = data.gas;
-    document.getElementById("human").innerText = data.humanDetected;
+
+    // ✅ Human detection alert color
+    let h = document.getElementById("human");
+    h.innerText = data.humanDetected;
+    h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
 
     const { lat, lng, alt } = data.gps;
 
-    document.getElementById("gpsBox").innerHTML = `
-        <b>GPS DATA</b><br>
-        Lat: ${lat.toFixed(6)}<br>
-        Lon: ${lng.toFixed(6)}<br>
-        Alt: ${alt.toFixed(2)} m
-    `;
+    document.getElementById("lat").innerText = lat.toFixed(6);
+    document.getElementById("lon").innerText = lng.toFixed(6);
+    document.getElementById("alt").innerText = alt.toFixed(2);
 
     gpsMarker.setLatLng([lat, lng]);
     map.setView([lat, lng]);
+
+    robotPath.addLatLng([lat, lng]); // ✅ trace path
 });
 </script>
 
