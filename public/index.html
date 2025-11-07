@@ -98,8 +98,6 @@
             font-size: 18px;
             transition: background-color 0.3s ease;
         }
-
-        /* ✅ New Map + GPS Styles */
         .map-wrapper {
             margin-top: 20px;
             display: flex;
@@ -131,10 +129,6 @@
         .gps-info p {
             margin: 8px 0;
         }
-        .gps-info b {
-            color: #1e90ff;
-        }
-
         #human {
             font-weight: bold;
             font-size: 20px;
@@ -187,7 +181,6 @@
         </div>
     </div>
 
-    <!-- ✅ Map + GPS Info -->
     <div class="map-wrapper">
         <div class="map-box" id="map"></div>
 
@@ -230,28 +223,23 @@ function toggleAutopilot() {
 </script>
 
 <script>
-// ✅ Init map
-let map = L.map('map').setView([6.9271, 79.8612], 20);
+// ✅ Init map — zoomed out a bit so map tiles load correctly
+let map = L.map('map').setView([6.9271, 79.8612], 18);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 22,
 }).addTo(map);
 
 let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
+let robotPath = L.polyline([], {weight: 3, color: "cyan"}).addTo(map);
 
-// ✅ Optional: Draw the travel path
-let robotPath = L.polyline([], {weight: 3}).addTo(map);
-
-// ✅ Receive live robot data
 socket.on("robot-data", (data) => {
-
     document.getElementById("temp").innerText = data.temperature;
     document.getElementById("gas").innerText = data.gas;
 
-    // ✅ Human detection alert color
-    let h = document.getElementById("human");
-    h.innerText = data.humanDetected;
-    h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
+    let humanState = document.getElementById("human");
+    humanState.innerText = data.humanDetected;
+    humanState.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
 
     const { lat, lng, alt } = data.gps;
 
@@ -260,14 +248,13 @@ socket.on("robot-data", (data) => {
     document.getElementById("alt").innerText = alt.toFixed(2);
 
     gpsMarker.setLatLng([lat, lng]);
-    map.setView([lat, lng]);
-
-    robotPath.addLatLng([lat, lng]); // ✅ trace path
+    robotPath.addLatLng([lat, lng]);
 });
 </script>
 
 </body>
 </html>
+
 
 
 
