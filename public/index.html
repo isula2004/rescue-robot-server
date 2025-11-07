@@ -98,6 +98,15 @@
             font-size: 18px;
             transition: background-color 0.3s ease;
         }
+        #human {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        #airSafetyStatus {
+            font-weight: bold;
+            font-size: 22px;
+        }
+
         .map-wrapper {
             margin-top: 20px;
             display: flex;
@@ -123,15 +132,7 @@
         }
         .gps-info h3 {
             margin-top: 0;
-            color: #00e6ff;
             text-align: center;
-        }
-        .gps-info p {
-            margin: 8px 0;
-        }
-        #human {
-            font-weight: bold;
-            font-size: 20px;
         }
     </style>
 
@@ -140,7 +141,6 @@
 </head>
 
 <body>
-
 <h1>
     <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png"
          width="45" height="45">
@@ -171,7 +171,13 @@
         <div class="sensor-box">
             <h3>Sensor Data</h3>
             <p>Temperature: <span id="temp">--</span> °C</p>
-            <p>Gas Level: <span id="gas">--</span> %</p>
+
+            <!-- ✅ Updated Air Safety Section -->
+            <p>Air Safety Status:
+                <span id="airSafetyStatus">--</span>
+                <small>(Gas: <span id="airSafetyRaw">--</span>)</small>
+            </p>
+
             <p>Human Detection: <span id="human">--</span></p>
         </div>
 
@@ -186,9 +192,9 @@
 
         <div class="gps-info" id="gpsBox">
             <h3>📍 GPS DATA</h3>
-            <p><b>Latitude:</b> <span id="lat">--</span></p>
-            <p><b>Longitude:</b> <span id="lon">--</span></p>
-            <p><b>Altitude:</b> <span id="alt">--</span> m</p>
+            <p><b>Lat:</b> <span id="lat">--</span></p>
+            <p><b>Lon:</b> <span id="lon">--</span></p>
+            <p><b>Alt:</b> <span id="alt">--</span> m</p>
         </div>
     </div>
 
@@ -223,7 +229,7 @@ function toggleAutopilot() {
 </script>
 
 <script>
-// ✅ Init map — zoomed out a bit so map tiles load correctly
+// ✅ Map with slightly zoomed-out default
 let map = L.map('map').setView([6.9271, 79.8612], 18);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -231,29 +237,50 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
-let robotPath = L.polyline([], {weight: 3, color: "cyan"}).addTo(map);
+let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
+// ✅ Live Robot Data
 socket.on("robot-data", (data) => {
     document.getElementById("temp").innerText = data.temperature;
-    document.getElementById("gas").innerText = data.gas;
 
-    let humanState = document.getElementById("human");
-    humanState.innerText = data.humanDetected;
-    humanState.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
+    // ✅ Human detection
+    let h = document.getElementById("human");
+    h.innerText = data.humanDetected;
+    h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
 
+    // ✅ Air Safety Status
+    let gasValue = data.airSafety;
+    let statusEl = document.getElementById("airSafetyStatus");
+    document.getElementById("airSafetyRaw").innerText = gasValue;
+
+    if (gasValue <= 300) {
+        statusEl.innerText = "✅ SAFE";
+        statusEl.style.color = "#00ff00";
+    } 
+    else if (gasValue <= 600) {
+        statusEl.innerText = "⚠️ WARNING";
+        statusEl.style.color = "#ffcc00";
+    } 
+    else {
+        statusEl.innerText = "🔴 DANGER";
+        statusEl.style.color = "#ff0000";
+    }
+
+    // ✅ GPS Update
     const { lat, lng, alt } = data.gps;
-
     document.getElementById("lat").innerText = lat.toFixed(6);
     document.getElementById("lon").innerText = lng.toFixed(6);
     document.getElementById("alt").innerText = alt.toFixed(2);
 
     gpsMarker.setLatLng([lat, lng]);
+    map.setView([lat, lng]);
     robotPath.addLatLng([lat, lng]);
 });
 </script>
 
 </body>
 </html>
+
 
 
 
