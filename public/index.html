@@ -35,6 +35,12 @@
             background-color: #1a1a1a;
             border: 3px solid #1e90ff;
             border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            color: #ff4d4d;
+            font-weight: bold;
         }
         .controls-box {
             width: 27%;
@@ -101,10 +107,9 @@
         }
     </style>
 
-    <!-- ✅ Leaflet (Map Library) -->
+    <!-- ✅ Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 </head>
 
 <body>
@@ -117,10 +122,9 @@
 
     <div class="container">
 
-        <!-- TOP: VIDEO + CONTROLS -->
         <div class="top-section">
             <div class="video-box" id="video">
-                <p style="margin-top:210px;">Video Feed</p>
+                🚫 ROBOT OFFLINE
             </div>
 
             <div class="controls-box" id="controlBox">
@@ -138,12 +142,11 @@
             </div>
         </div>
 
-        <!-- MIDDLE: SENSOR + AUTOPILOT -->
         <div class="middle-section">
             <div class="sensor-box">
                 <h3>Sensor Data</h3>
-                <p>Temperature: <span id="temp">--</span></p>
-                <p>Gas Level: <span id="gas">--</span></p>
+                <p>Temperature: <span id="temp">--</span> °C</p>
+                <p>Gas Level: <span id="gas">--</span> %</p>
                 <p>Human Detection: <span id="human">--</span></p>
             </div>
 
@@ -153,7 +156,6 @@
             </div>
         </div>
 
-        <!-- ✅ MAP -->
         <div class="map-box" id="map"></div>
 
     </div>
@@ -162,60 +164,49 @@
     <script src="/socket.io/socket.io.js"></script>
 
 <script>
-let socket = io(); 
+let socket = io();
 let autopilot = false;
 
-// ✅ Send robot control commands
+// ✅ Controls
 function sendCommand(cmd) {
-    console.log("Sending command: " + cmd);
     socket.emit("robot-command", cmd);
 }
 
 function toggleAutopilot() {
     autopilot = !autopilot;
-    let controlPanel = document.getElementById("controlBox");
+    let ctrl = document.getElementById("controlBox");
     let btn = document.getElementById("autopilotBtn");
 
     if (autopilot) {
-        controlPanel.classList.add("disabled");
+        ctrl.classList.add("disabled");
         btn.textContent = "TAKE CONTROL";
         btn.style.backgroundColor = "#ff9500";
-        socket.emit("autopilot", true);
     } else {
-        controlPanel.classList.remove("disabled");
+        ctrl.classList.remove("disabled");
         btn.textContent = "AUTO PILOT";
         btn.style.backgroundColor = "#cc0000";
-        socket.emit("autopilot", false);
     }
+    socket.emit("autopilot", autopilot);
 }
 </script>
 
-<!-- ✅ MAP SCRIPT -->
+<!-- ✅ LIVE MAP + SENSOR UPDATES -->
 <script>
-let map = L.map('map').setView([6.9271, 79.8612], 13); // Colombo center
+// ✅ Init map centered at Colombo
+let map = L.map('map').setView([6.9271, 79.8612], 14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap Contributors'
-}).addTo(map);
+let marker = L.marker([6.9271, 79.8612]).addTo(map);
 
-// ✅ Robot marker (temporary)
-let robotMarker = L.marker([6.9271, 79.8612]).addTo(map);
-robotMarker.bindPopup("Robot Location").openPopup();
+// ✅ Receive live robot data
+socket.on("robot-data", (data) => {
+    document.getElementById("temp").innerText = data.temperature;
+    document.getElementById("gas").innerText = data.gas;
+    document.getElementById("human").innerText = data.humanDetected;
 
-// ✅ Update marker on GPS data from server
-socket.on("gps-update", (data) => {
-    robotMarker.setLatLng([data.lat, data.lng]);
-    map.setView([data.lat, data.lng]);
+    marker.setLatLng([data.gps.lat, data.gps.lng]);
+    map.setView([data.gps.lat, data.gps.lng]);
 });
-
-// ✅ Fake GPS movement for testing (remove later)
-let lat = 6.9271;
-let lng = 79.8612;
-setInterval(() => {
-    lat += 0.0005;
-    lng += 0.0005;
-    socket.emit("gps-update", { lat, lng });
-}, 1000);
 </script>
 
 </body>
