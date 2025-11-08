@@ -168,16 +168,14 @@
 <div class="container">
   <div class="top-section">
     <div class="video-box" id="video">
-      <video autoplay loop muted playsinline controls>
-        <source src="videos/fake_robot.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
+  <!-- ✅ Change this to MJPEG stream from your Pi -->
+        <img src="http://<PI_IP>:8081/?action=stream" alt="Robot Camera" style="width:100%; height:100%; object-fit:cover;">
 
-      <!-- 🚧 Autopilot overlay message -->
-      <div class="autopilot-overlay" id="autopilotOverlay">
-        🧠 The Autopilot mode is still under construction.<br>
-        Please take control.
-      </div>
+  <!-- 🚧 Autopilot overlay message -->
+        <div class="autopilot-overlay" id="autopilotOverlay">
+            🧠 The Autopilot mode is still under construction.<br>
+            Please take control.
+        </div>
     </div>
 
     <div class="controls-box" id="controlBox">
