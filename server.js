@@ -2,9 +2,7 @@ const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
-const path = require("path");
 
-// Serve static files (your dashboard, video, etc.)
 app.use(express.static("public"));
 
 function getFakeRobotData() {
@@ -38,7 +36,6 @@ io.on("connection", (socket) => {
     console.log("🤖 Autopilot:", state ? "ON" : "OFF");
   });
 
-  // Emit fake data every second
   const interval = setInterval(() => {
     socket.emit("robot-data", getFakeRobotData());
   }, 1000);
@@ -53,6 +50,7 @@ const PORT = process.env.PORT || 3030;
 http.listen(PORT, "0.0.0.0", () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );
+
 
 
 
