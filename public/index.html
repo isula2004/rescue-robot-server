@@ -156,9 +156,9 @@
 
     <div class="top-section">
         <div class="video-box" id="video">
-            <!-- ✅ Replace this sample video URL with your own if needed -->
-            <video autoplay loop muted playsinline>
-                <source src="https://cdn.pixabay.com/vimeo/261226814/robot-17426.mp4?width=640&hash=2a0ef0ceadc5c52f91d6a182a946b21d20a8a18a" type="video/mp4">
+            <!-- ✅ Local fake video file -->
+            <video autoplay loop muted playsinline controls>
+                <source src="videos/fake_robot.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -234,7 +234,7 @@ function toggleAutopilot() {
 </script>
 
 <script>
-let map = L.map('map').setView([6.9271, 79.8612], 18);
+let map = L.map('map').setView([6.9271, 79.8612], 19);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(map);
 let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
 let robotPath = L.polyline([], {weight: 3}).addTo(map);
@@ -273,6 +273,7 @@ socket.on("robot-data", (data) => {
 
 </body>
 </html>
+
 
 
 
