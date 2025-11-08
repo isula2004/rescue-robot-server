@@ -5,6 +5,7 @@ const io = require("socket.io")(http);
 
 app.use(express.static("public"));
 
+// For now, we keep sending fake data. Later, you can integrate real Pi sensor data.
 function getFakeRobotData() {
   const gasValue = Math.floor(Math.random() * 1023);
 
