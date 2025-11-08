@@ -41,6 +41,8 @@
             font-size: 28px;
             color: #ff4d4d;
             font-weight: bold;
+            overflow: hidden;
+            position: relative;
         }
         .controls-box {
             width: 27%;
@@ -106,7 +108,6 @@
             font-weight: bold;
             font-size: 22px;
         }
-
         .map-wrapper {
             margin-top: 20px;
             display: flex;
@@ -134,6 +135,11 @@
             margin-top: 0;
             text-align: center;
         }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -142,15 +148,20 @@
 
 <body>
 <h1>
-    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png"
-         width="45" height="45">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" width="45" height="45">
     Disaster Rescue Robot Dashboard
 </h1>
 
 <div class="container">
 
     <div class="top-section">
-        <div class="video-box" id="video">🚫 ROBOT OFFLINE</div>
+        <div class="video-box" id="video">
+            <!-- ✅ Replace this sample video URL with your own if needed -->
+            <video autoplay loop muted playsinline>
+                <source src="https://cdn.pixabay.com/vimeo/261226814/robot-17426.mp4?width=640&hash=2a0ef0ceadc5c52f91d6a182a946b21d20a8a18a" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
 
         <div class="controls-box" id="controlBox">
             <h3>Robot Controls</h3>
@@ -171,19 +182,14 @@
         <div class="sensor-box">
             <h3>Sensor Data</h3>
             <p>Temperature: <span id="temp">--</span> °C</p>
-
-            <!-- ✅ Updated Air Safety Section -->
-            <p>Air Safety Status:
-                <span id="airSafetyStatus">--</span>
+            <p>Air Safety Status: <span id="airSafetyStatus">--</span>
                 <small>(Gas: <span id="airSafetyRaw">--</span>)</small>
             </p>
-
             <p>Human Detection: <span id="human">--</span></p>
         </div>
 
         <div class="autopilot-box">
-            <button class="autopilot-button" id="autopilotBtn"
-                    onclick="toggleAutopilot()">AUTO PILOT</button>
+            <button class="autopilot-button" id="autopilotBtn" onclick="toggleAutopilot()">AUTO PILOT</button>
         </div>
     </div>
 
@@ -201,7 +207,6 @@
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-
 <script>
 let socket = io();
 let autopilot = false;
@@ -229,26 +234,17 @@ function toggleAutopilot() {
 </script>
 
 <script>
-// ✅ Map with slightly zoomed-out default
 let map = L.map('map').setView([6.9271, 79.8612], 18);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 22,
-}).addTo(map);
-
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(map);
 let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
 let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
-// ✅ Live Robot Data
 socket.on("robot-data", (data) => {
     document.getElementById("temp").innerText = data.temperature;
-
-    // ✅ Human detection
     let h = document.getElementById("human");
     h.innerText = data.humanDetected;
     h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
 
-    // ✅ Air Safety Status
     let gasValue = data.airSafety;
     let statusEl = document.getElementById("airSafetyStatus");
     document.getElementById("airSafetyRaw").innerText = gasValue;
@@ -256,17 +252,14 @@ socket.on("robot-data", (data) => {
     if (gasValue <= 300) {
         statusEl.innerText = "✅ SAFE";
         statusEl.style.color = "#00ff00";
-    } 
-    else if (gasValue <= 600) {
+    } else if (gasValue <= 600) {
         statusEl.innerText = "⚠️ WARNING";
         statusEl.style.color = "#ffcc00";
-    } 
-    else {
+    } else {
         statusEl.innerText = "🔴 DANGER";
         statusEl.style.color = "#ff0000";
     }
 
-    // ✅ GPS Update
     const { lat, lng, alt } = data.gps;
     document.getElementById("lat").innerText = lat.toFixed(6);
     document.getElementById("lon").innerText = lng.toFixed(6);
@@ -280,6 +273,7 @@ socket.on("robot-data", (data) => {
 
 </body>
 </html>
+
 
 
 
