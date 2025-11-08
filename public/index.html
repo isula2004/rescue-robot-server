@@ -1,209 +1,224 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Disaster Rescue Robot Dashboard</title>
+  <title>Disaster Rescue Robot Dashboard</title>
+  <style>
+    body {
+      background-color: #000;
+      font-family: Arial, sans-serif;
+      color: #e0e0e0;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      color: #ffffff;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    .container {
+      width: 95%;
+      margin: auto;
+    }
+    .top-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .video-box {
+      width: 70%;
+      height: 450px;
+      background-color: #1a1a1a;
+      border: 3px solid #1e90ff;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .autopilot-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #ffcc00;
+      font-size: 26px;
+      font-weight: bold;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-shadow: 0 0 5px #000;
+      z-index: 5;
+    }
+    .controls-box {
+      width: 27%;
+      background-color: #111;
+      border: 2px solid #1e90ff;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      transition: opacity 0.4s ease;
+    }
+    .disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    button {
+      background-color: #1e90ff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 6px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      width: 120px;
+    }
+    button:hover {
+      background-color: #0e70d1;
+    }
+    .middle-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    .sensor-box {
+      width: 60%;
+      background-color: #111;
+      border: 2px solid #1e90ff;
+      border-radius: 6px;
+      padding: 10px 20px;
+      text-align: left;
+    }
+    .autopilot-box {
+      width: 35%;
+      background-color: #111;
+      border: 2px solid #1e90ff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .autopilot-button {
+      width: 80%;
+      height: 50px;
+      background-color: #cc0000;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
+    }
+    #human {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    #airSafetyStatus {
+      font-weight: bold;
+      font-size: 22px;
+    }
+    .map-wrapper {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+      height: 420px;
+    }
+    .map-box {
+      flex: 1;
+      background-color: #1a1a1a;
+      border: 3px solid #1e90ff;
+      border-radius: 8px;
+    }
+    .gps-info {
+      width: 260px;
+      background: rgba(20, 20, 20, 0.95);
+      border: 2px solid #1e90ff;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: left;
+      font-size: 16px;
+      color: #00ff9d;
+      box-shadow: 0 0 10px #1e90ff;
+    }
+    .gps-info h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
 
-    <style>
-        body {
-            background-color: #000;
-            font-family: Arial, sans-serif;
-            color: #e0e0e0;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        h1 {
-            color: #ffffff;
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        .container {
-            width: 95%;
-            margin: auto;
-        }
-        .top-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .video-box {
-            width: 70%;
-            height: 450px;
-            background-color: #1a1a1a;
-            border: 3px solid #1e90ff;
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 28px;
-            color: #ff4d4d;
-            font-weight: bold;
-            overflow: hidden;
-            position: relative;
-        }
-        .controls-box {
-            width: 27%;
-            background-color: #111;
-            border: 2px solid #1e90ff;
-            border-radius: 6px;
-            padding: 12px;
-            text-align: center;
-            transition: opacity 0.4s ease;
-        }
-        .disabled {
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        button {
-            background-color: #1e90ff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 6px;
-            color: white;
-            font-size: 15px;
-            cursor: pointer;
-            width: 120px;
-        }
-        button:hover {
-            background-color: #0e70d1;
-        }
-        .middle-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-        .sensor-box {
-            width: 60%;
-            background-color: #111;
-            border: 2px solid #1e90ff;
-            border-radius: 6px;
-            padding: 10px 20px;
-            text-align: left;
-        }
-        .autopilot-box {
-            width: 35%;
-            background-color: #111;
-            border: 2px solid #1e90ff;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .autopilot-button {
-            width: 80%;
-            height: 50px;
-            background-color: #cc0000;
-            font-size: 18px;
-            transition: background-color 0.3s ease;
-        }
-        #human {
-            font-weight: bold;
-            font-size: 20px;
-        }
-        #airSafetyStatus {
-            font-weight: bold;
-            font-size: 22px;
-        }
-        .map-wrapper {
-            margin-top: 20px;
-            display: flex;
-            gap: 20px;
-            height: 420px;
-        }
-        .map-box {
-            flex: 1;
-            background-color: #1a1a1a;
-            border: 3px solid #1e90ff;
-            border-radius: 8px;
-        }
-        .gps-info {
-            width: 260px;
-            background: rgba(20, 20, 20, 0.95);
-            border: 2px solid #1e90ff;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: left;
-            font-size: 16px;
-            color: #00ff9d;
-            box-shadow: 0 0 10px #1e90ff;
-        }
-        .gps-info h3 {
-            margin-top: 0;
-            text-align: center;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-    </style>
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body>
 <h1>
-    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" width="45" height="45">
-    Disaster Rescue Robot Dashboard
+  <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" width="45" height="45">
+  Disaster Rescue Robot Dashboard
 </h1>
 
 <div class="container">
+  <div class="top-section">
+    <div class="video-box" id="video">
+      <video autoplay loop muted playsinline controls>
+        <source src="videos/fake_robot.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
 
-    <div class="top-section">
-        <div class="video-box" id="video">
-            <!-- ✅ Local fake video file -->
-            <video autoplay loop muted playsinline controls>
-                <source src="videos/fake_robot.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-
-        <div class="controls-box" id="controlBox">
-            <h3>Robot Controls</h3>
-            <button onclick="sendCommand('forward')">Forward</button><br>
-            <button onclick="sendCommand('left')">Left</button>
-            <button onclick="sendCommand('right')">Right</button><br>
-            <button onclick="sendCommand('backward')">Backward</button>
-
-            <h3>Camera</h3>
-            <button onclick="sendCommand('cam_up')">Up</button><br>
-            <button onclick="sendCommand('cam_left')">Left</button>
-            <button onclick="sendCommand('cam_right')">Right</button><br>
-            <button onclick="sendCommand('cam_down')">Down</button>
-        </div>
+      <!-- 🚧 Autopilot overlay message -->
+      <div class="autopilot-overlay" id="autopilotOverlay">
+        🧠 The Autopilot mode is still under construction.<br>
+        Please take control.
+      </div>
     </div>
 
-    <div class="middle-section">
-        <div class="sensor-box">
-            <h3>Sensor Data</h3>
-            <p>Temperature: <span id="temp">--</span> °C</p>
-            <p>Air Safety Status: <span id="airSafetyStatus">--</span>
-                <small>(Gas: <span id="airSafetyRaw">--</span>)</small>
-            </p>
-            <p>Human Detection: <span id="human">--</span></p>
-        </div>
+    <div class="controls-box" id="controlBox">
+      <h3>Robot Controls</h3>
+      <button onclick="sendCommand('forward')">Forward</button><br>
+      <button onclick="sendCommand('left')">Left</button>
+      <button onclick="sendCommand('right')">Right</button><br>
+      <button onclick="sendCommand('backward')">Backward</button>
 
-        <div class="autopilot-box">
-            <button class="autopilot-button" id="autopilotBtn" onclick="toggleAutopilot()">AUTO PILOT</button>
-        </div>
+      <h3>Camera</h3>
+      <button onclick="sendCommand('cam_up')">Up</button><br>
+      <button onclick="sendCommand('cam_left')">Left</button>
+      <button onclick="sendCommand('cam_right')">Right</button><br>
+      <button onclick="sendCommand('cam_down')">Down</button>
+    </div>
+  </div>
+
+  <div class="middle-section">
+    <div class="sensor-box">
+      <h3>Sensor Data</h3>
+      <p>Temperature: <span id="temp">--</span> °C</p>
+      <p>Air Safety Status: <span id="airSafetyStatus">--</span>
+        <small>(Gas: <span id="airSafetyRaw">--</span>)</small>
+      </p>
+      <p>Human Detection: <span id="human">--</span></p>
     </div>
 
-    <div class="map-wrapper">
-        <div class="map-box" id="map"></div>
-
-        <div class="gps-info" id="gpsBox">
-            <h3>📍 GPS DATA</h3>
-            <p><b>Lat:</b> <span id="lat">--</span></p>
-            <p><b>Lon:</b> <span id="lon">--</span></p>
-            <p><b>Alt:</b> <span id="alt">--</span> m</p>
-        </div>
+    <div class="autopilot-box">
+      <button class="autopilot-button" id="autopilotBtn" onclick="toggleAutopilot()">AUTO PILOT</button>
     </div>
+  </div>
 
+  <div class="map-wrapper">
+    <div class="map-box" id="map"></div>
+    <div class="gps-info" id="gpsBox">
+      <h3>📍 GPS DATA</h3>
+      <p><b>Lat:</b> <span id="lat">--</span></p>
+      <p><b>Lon:</b> <span id="lon">--</span></p>
+      <p><b>Alt:</b> <span id="alt">--</span> m</p>
+    </div>
+  </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -212,24 +227,27 @@ let socket = io();
 let autopilot = false;
 
 function sendCommand(cmd) {
-    socket.emit("robot-command", cmd);
+  socket.emit("robot-command", cmd);
 }
 
 function toggleAutopilot() {
-    autopilot = !autopilot;
-    let ctrl = document.getElementById("controlBox");
-    let btn = document.getElementById("autopilotBtn");
+  autopilot = !autopilot;
+  let ctrl = document.getElementById("controlBox");
+  let btn = document.getElementById("autopilotBtn");
+  let overlay = document.getElementById("autopilotOverlay");
 
-    if (autopilot) {
-        ctrl.classList.add("disabled");
-        btn.textContent = "TAKE CONTROL";
-        btn.style.backgroundColor = "#ff9500";
-    } else {
-        ctrl.classList.remove("disabled");
-        btn.textContent = "AUTO PILOT";
-        btn.style.backgroundColor = "#cc0000";
-    }
-    socket.emit("autopilot", autopilot);
+  if (autopilot) {
+    ctrl.classList.add("disabled");
+    btn.textContent = "TAKE CONTROL";
+    btn.style.backgroundColor = "#ff9500";
+    overlay.style.display = "flex"; // show overlay
+  } else {
+    ctrl.classList.remove("disabled");
+    btn.textContent = "AUTO PILOT";
+    btn.style.backgroundColor = "#cc0000";
+    overlay.style.display = "none"; // hide overlay
+  }
+  socket.emit("autopilot", autopilot);
 }
 </script>
 
@@ -240,39 +258,40 @@ let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
 let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
 socket.on("robot-data", (data) => {
-    document.getElementById("temp").innerText = data.temperature;
-    let h = document.getElementById("human");
-    h.innerText = data.humanDetected;
-    h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
+  document.getElementById("temp").innerText = data.temperature;
+  let h = document.getElementById("human");
+  h.innerText = data.humanDetected;
+  h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
 
-    let gasValue = data.airSafety;
-    let statusEl = document.getElementById("airSafetyStatus");
-    document.getElementById("airSafetyRaw").innerText = gasValue;
+  let gasValue = data.airSafety;
+  let statusEl = document.getElementById("airSafetyStatus");
+  document.getElementById("airSafetyRaw").innerText = gasValue;
 
-    if (gasValue <= 300) {
-        statusEl.innerText = "✅ SAFE";
-        statusEl.style.color = "#00ff00";
-    } else if (gasValue <= 600) {
-        statusEl.innerText = "⚠️ WARNING";
-        statusEl.style.color = "#ffcc00";
-    } else {
-        statusEl.innerText = "🔴 DANGER";
-        statusEl.style.color = "#ff0000";
-    }
+  if (gasValue <= 300) {
+    statusEl.innerText = "✅ SAFE";
+    statusEl.style.color = "#00ff00";
+  } else if (gasValue <= 600) {
+    statusEl.innerText = "⚠️ WARNING";
+    statusEl.style.color = "#ffcc00";
+  } else {
+    statusEl.innerText = "🔴 DANGER";
+    statusEl.style.color = "#ff0000";
+  }
 
-    const { lat, lng, alt } = data.gps;
-    document.getElementById("lat").innerText = lat.toFixed(6);
-    document.getElementById("lon").innerText = lng.toFixed(6);
-    document.getElementById("alt").innerText = alt.toFixed(2);
+  const { lat, lng, alt } = data.gps;
+  document.getElementById("lat").innerText = lat.toFixed(6);
+  document.getElementById("lon").innerText = lng.toFixed(6);
+  document.getElementById("alt").innerText = alt.toFixed(2);
 
-    gpsMarker.setLatLng([lat, lng]);
-    map.setView([lat, lng]);
-    robotPath.addLatLng([lat, lng]);
+  gpsMarker.setLatLng([lat, lng]);
+  map.setView([lat, lng]);
+  robotPath.addLatLng([lat, lng]);
 });
 </script>
 
 </body>
 </html>
+
 
 
 
