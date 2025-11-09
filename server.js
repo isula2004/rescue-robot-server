@@ -5,6 +5,7 @@ const io = require("socket.io")(http);
 
 app.use(express.static("public"));
 
+// Socket.io events
 io.on("connection", (socket) => {
   console.log("✅ Client connected:", socket.id);
 
@@ -17,8 +18,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("robot-data", (data) => {
-    // Forward to all other connected clients
-    socket.broadcast.emit("robot-data", data);
+    // Forward to all connected clients (including dashboard)
+    io.emit("robot-data", data);
+    console.log("📡 Data forwarded:", data);
   });
 
   socket.on("disconnect", () => {
@@ -30,6 +32,7 @@ const PORT = process.env.PORT || 3030;
 http.listen(PORT, "0.0.0.0", () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );
+
 
 
 
