@@ -3,27 +3,125 @@
 <head>
   <title>Disaster Rescue Robot Dashboard</title>
   <style>
-    body { background-color: #000; font-family: Arial; color: #e0e0e0; text-align:center; margin:0; padding:0;}
-    h1 { color: #fff; margin-top:20px; display:flex; justify-content:center; align-items:center; gap:10px; }
-    .container { width:95%; margin:auto; }
-    .top-section { display:flex; justify-content:space-between; margin-top:20px; }
-    .video-box { width:70%; height:450px; background:#1a1a1a; border:3px solid #1e90ff; border-radius:6px; display:flex; justify-content:center; align-items:center; overflow:hidden; position:relative; }
-    .autopilot-overlay { position:absolute; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.7); color:#ffcc00; font-size:26px; font-weight:bold; display:none; flex-direction:column; justify-content:center; align-items:center; text-shadow:0 0 5px #000; z-index:5; }
-    .controls-box { width:27%; background:#111; border:2px solid #1e90ff; border-radius:6px; padding:12px; text-align:center; transition:opacity 0.4s ease; }
-    .disabled { opacity:0.3; pointer-events:none; }
-    button { background-color:#1e90ff; border:none; border-radius:5px; padding:10px; margin:6px; color:white; font-size:15px; cursor:pointer; width:120px; }
-    button:hover { background-color:#0e70d1; }
-    .middle-section { display:flex; justify-content:space-between; margin-top:15px; }
-    .sensor-box { width:60%; background:#111; border:2px solid #1e90ff; border-radius:6px; padding:10px 20px; text-align:left; }
-    .autopilot-box { width:35%; background:#111; border:2px solid #1e90ff; border-radius:6px; display:flex; align-items:center; justify-content:center; }
-    .autopilot-button { width:80%; height:50px; background-color:#cc0000; font-size:18px; transition: background-color 0.3s ease; }
-    #human { font-weight:bold; font-size:20px; }
-    #airSafetyStatus { font-weight:bold; font-size:22px; }
-    .map-wrapper { margin-top:20px; display:flex; gap:20px; height:420px; }
-    .map-box { flex:1; background:#1a1a1a; border:3px solid #1e90ff; border-radius:8px; }
-    .gps-info { width:260px; background:rgba(20,20,20,0.95); border:2px solid #1e90ff; border-radius:12px; padding:15px; text-align:left; font-size:16px; color:#00ff9d; box-shadow:0 0 10px #1e90ff; }
-    .gps-info h3 { margin-top:0; text-align:center; }
-    img, video { width:100%; height:100%; object-fit:cover; }
+    body {
+      background-color: #000;
+      font-family: Arial, sans-serif;
+      color: #e0e0e0;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      color: #ffffff;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    .container { width: 95%; margin: auto; }
+    .top-section { display: flex; justify-content: space-between; margin-top: 20px; }
+    .video-box {
+      width: 70%;
+      height: 450px;
+      background-color: #1a1a1a;
+      border: 3px solid #1e90ff;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .autopilot-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      color: #ffcc00;
+      font-size: 26px;
+      font-weight: bold;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-shadow: 0 0 5px #000;
+      z-index: 5;
+    }
+    .controls-box {
+      width: 27%;
+      background-color: #111;
+      border: 2px solid #1e90ff;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      transition: opacity 0.4s ease;
+    }
+    .disabled { opacity: 0.3; pointer-events: none; }
+    button {
+      background-color: #1e90ff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 6px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      width: 120px;
+    }
+    button:hover { background-color: #0e70d1; }
+    .middle-section { display: flex; justify-content: space-between; margin-top: 15px; }
+    .sensor-box {
+      width: 60%;
+      background-color: #111;
+      border: 2px solid #1e90ff;
+      border-radius: 6px;
+      padding: 10px 20px;
+      text-align: left;
+    }
+    .autopilot-box {
+      width: 35%;
+      background-color: #111;
+      border: 2px solid #1e90ff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .autopilot-button {
+      width: 80%;
+      height: 50px;
+      background-color: #cc0000;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
+    }
+    #human { font-weight: bold; font-size: 20px; }
+    #airSafetyStatus { font-weight: bold; font-size: 22px; }
+    .map-wrapper {
+      margin-top: 20px;
+      display: flex;
+      gap: 20px;
+      height: 420px;
+    }
+    .map-box {
+      flex: 1;
+      background-color: #1a1a1a;
+      border: 3px solid #1e90ff;
+      border-radius: 8px;
+    }
+    .gps-info {
+      width: 260px;
+      background: rgba(20,20,20,0.95);
+      border: 2px solid #1e90ff;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: left;
+      font-size: 16px;
+      color: #00ff9d;
+      box-shadow: 0 0 10px #1e90ff;
+    }
+    .gps-info h3 { margin-top: 0; text-align: center; }
+    video, img { width: 100%; height: 100%; object-fit: cover; }
   </style>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -41,7 +139,8 @@
     <div class="video-box" id="video">
       <img src="http://20.188.119.44:8081/?action=stream" alt="Robot Camera">
       <div class="autopilot-overlay" id="autopilotOverlay">
-        🧠 Autopilot mode is still under construction.<br>Please take control.
+        🧠 The Autopilot mode is still under construction.<br>
+        Please take control.
       </div>
     </div>
 
@@ -91,60 +190,75 @@
 let socket = io();
 let autopilot = false;
 
-function sendCommand(cmd){ socket.emit("robot-command", cmd); }
+function sendCommand(cmd) {
+  socket.emit("robot-command", cmd);
+}
 
-function toggleAutopilot(){
+function toggleAutopilot() {
   autopilot = !autopilot;
   let ctrl = document.getElementById("controlBox");
   let btn = document.getElementById("autopilotBtn");
   let overlay = document.getElementById("autopilotOverlay");
-  if(autopilot){
+
+  if (autopilot) {
     ctrl.classList.add("disabled");
     btn.textContent = "TAKE CONTROL";
-    btn.style.backgroundColor="#ff9500";
-    overlay.style.display="flex";
+    btn.style.backgroundColor = "#ff9500";
+    overlay.style.display = "flex";
   } else {
     ctrl.classList.remove("disabled");
     btn.textContent = "AUTO PILOT";
-    btn.style.backgroundColor="#cc0000";
-    overlay.style.display="none";
+    btn.style.backgroundColor = "#cc0000";
+    overlay.style.display = "none";
   }
   socket.emit("autopilot", autopilot);
 }
 
-// Map
-let map = L.map('map').setView([6.9271,79.8612],19);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22}).addTo(map);
-let gpsMarker=L.marker([6.9271,79.8612]).addTo(map);
-let robotPath=L.polyline([], {weight:3}).addTo(map);
+// Map setup
+let map = L.map('map').setView([6.9271, 79.8612], 19);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(map);
+let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
+let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
-// Dashboard live update
-socket.on("robot-data", data=>{
-  document.getElementById("temp").innerText=data.temperature;
-  let h=document.getElementById("human");
-  h.innerText=data.humanDetected;
-  h.style.color=data.humanDetected==="YES"?"red":"#0f0";
+// Listen for real Pi sensor data
+socket.on("robot-data", (data) => {
+  // Temperature
+  document.getElementById("temp").innerText = data.temperature;
 
-  let gasValue=data.airSafety;
-  let statusEl=document.getElementById("airSafetyStatus");
-  document.getElementById("airSafetyRaw").innerText=gasValue;
+  // Human detection
+  let h = document.getElementById("human");
+  h.innerText = data.humanDetected;
+  h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
 
-  statusEl.innerText=gasValue;
-  statusEl.style.color= gasValue==="✅ SAFE"?"#00ff00": gasValue==="🔴 DANGER"?"#ff0000":"#ffcc00";
+  // Gas / Air Safety
+  let gasValue = data.airSafety;
+  let statusEl = document.getElementById("airSafetyStatus");
+  document.getElementById("airSafetyRaw").innerText = gasValue;
 
-  const {lat,lng,alt}=data.gps;
-  document.getElementById("lat").innerText=lat.toFixed(6);
-  document.getElementById("lon").innerText=lng.toFixed(6);
-  document.getElementById("alt").innerText=alt.toFixed(2);
+  if (gasValue.includes("SAFE")) {
+    statusEl.innerText = "✅ SAFE";
+    statusEl.style.color = "#00ff00";
+  } else if (gasValue.includes("WARNING")) {
+    statusEl.innerText = "⚠️ WARNING";
+    statusEl.style.color = "#ffcc00";
+  } else {
+    statusEl.innerText = "🔴 DANGER";
+    statusEl.style.color = "#ff0000";
+  }
 
-  gpsMarker.setLatLng([lat,lng]);
-  map.setView([lat,lng]);
-  robotPath.addLatLng([lat,lng]);
+  // GPS
+  const { lat, lng, alt } = data.gps;
+  document.getElementById("lat").innerText = lat.toFixed(6);
+  document.getElementById("lon").innerText = lng.toFixed(6);
+  document.getElementById("alt").innerText = alt.toFixed(2);
+
+  gpsMarker.setLatLng([lat, lng]);
+  map.setView([lat, lng]);
+  robotPath.addLatLng([lat, lng]);
 });
 </script>
 </body>
 </html>
-
 
 
 
