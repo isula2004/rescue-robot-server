@@ -1,56 +1,48 @@
 const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const io = require("socket.io")(http); // dashboard clients
+const WebSocket = require("ws"); // Pi websocket
 
 app.use(express.static("public"));
 
-// For now, we keep sending fake data. Later, you can integrate real Pi sensor data.
-function getFakeRobotData() {
-  const gasValue = Math.floor(Math.random() * 1023);
+let latestData = {}; // keep last sensor data
 
-  // Determine air safety level
-  let airSafety = "✅ SAFE";
-  if (gasValue > 700) airSafety = "🔴 DANGER";
-  else if (gasValue > 400) airSafety = "⚠️ WARNING";
+// WebSocket server for Pi (on same port, different path)
+const wss = new WebSocket.Server({ server: http, path: "/pi" });
 
-  return {
-    temperature: (25 + Math.random() * 10).toFixed(1),
-    airSafety,
-    humanDetected: Math.random() > 0.7 ? "YES" : "NO",
-    gps: {
-      lat: 6.9271 + (Math.random() - 0.5) * 0.00015,
-      lng: 79.8612 + (Math.random() - 0.5) * 0.00015,
-      alt: 5 + Math.random() * 2,
-    },
-  };
-}
+wss.on("connection", (ws) => {
+  console.log("✅ Pi connected via WebSocket");
 
-io.on("connection", (socket) => {
-  console.log("✅ Client connected:", socket.id);
-
-  socket.on("robot-command", (cmd) => {
-    console.log("🎮 Robot Command:", cmd);
+  ws.on("message", (msg) => {
+    try {
+      latestData = JSON.parse(msg);
+      io.emit("robot-data", latestData); // broadcast to dashboards
+    } catch (err) {
+      console.log("⚠️ Error parsing message:", err);
+    }
   });
 
-  socket.on("autopilot", (state) => {
-    console.log("🤖 Autopilot:", state ? "ON" : "OFF");
-  });
-
-  const interval = setInterval(() => {
-    socket.emit("robot-data", getFakeRobotData());
-  }, 1000);
-
-  socket.on("disconnect", () => {
-    clearInterval(interval);
-    console.log("❌ Disconnected:", socket.id);
-  });
+  ws.on("close", () => console.log("❌ Pi disconnected"));
 });
 
-const PORT = process.env.PORT || 3030;
+// Socket.io for dashboard
+io.on("connection", (socket) => {
+  console.log("✅ Dashboard connected:", socket.id);
+
+  // send latest data immediately
+  socket.emit("robot-data", latestData);
+
+  socket.on("robot-command", (cmd) => console.log("🎮 Robot Command:", cmd));
+  socket.on("autopilot", (state) => console.log("🤖 Autopilot:", state ? "ON" : "OFF"));
+  socket.on("disconnect", () => console.log("❌ Dashboard disconnected:", socket.id));
+});
+
+const PORT = 3030;
 http.listen(PORT, "0.0.0.0", () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );
+
 
 
 
