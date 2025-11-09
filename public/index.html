@@ -257,9 +257,9 @@ function toggleAutopilot() {
 </script>
 
 <script>
-let map = L.map('map').setView([6.9271, 79.8612], 19);
+let map = L.map('map').setView([0, 0], 19);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(map);
-let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
+let gpsMarker = L.marker([0, 0]).addTo(map);
 let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
 socket.on("robot-data", (data) => {
