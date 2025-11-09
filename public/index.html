@@ -19,8 +19,15 @@
       align-items: center;
       gap: 10px;
     }
-    .container { width: 95%; margin: auto; }
-    .top-section { display: flex; justify-content: space-between; margin-top: 20px; }
+    .container {
+      width: 95%;
+      margin: auto;
+    }
+    .top-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
     .video-box {
       width: 70%;
       height: 450px;
@@ -35,9 +42,11 @@
     }
     .autopilot-overlay {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.7);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
       color: #ffcc00;
       font-size: 26px;
       font-weight: bold;
@@ -57,7 +66,10 @@
       text-align: center;
       transition: opacity 0.4s ease;
     }
-    .disabled { opacity: 0.3; pointer-events: none; }
+    .disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
     button {
       background-color: #1e90ff;
       border: none;
@@ -69,8 +81,14 @@
       cursor: pointer;
       width: 120px;
     }
-    button:hover { background-color: #0e70d1; }
-    .middle-section { display: flex; justify-content: space-between; margin-top: 15px; }
+    button:hover {
+      background-color: #0e70d1;
+    }
+    .middle-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
     .sensor-box {
       width: 60%;
       background-color: #111;
@@ -95,8 +113,14 @@
       font-size: 18px;
       transition: background-color 0.3s ease;
     }
-    #human { font-weight: bold; font-size: 20px; }
-    #airSafetyStatus { font-weight: bold; font-size: 22px; }
+    #human {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    #airSafetyStatus {
+      font-weight: bold;
+      font-size: 22px;
+    }
     .map-wrapper {
       margin-top: 20px;
       display: flex;
@@ -111,7 +135,7 @@
     }
     .gps-info {
       width: 260px;
-      background: rgba(20,20,20,0.95);
+      background: rgba(20, 20, 20, 0.95);
       border: 2px solid #1e90ff;
       border-radius: 12px;
       padding: 15px;
@@ -120,8 +144,15 @@
       color: #00ff9d;
       box-shadow: 0 0 10px #1e90ff;
     }
-    .gps-info h3 { margin-top: 0; text-align: center; }
-    video, img { width: 100%; height: 100%; object-fit: cover; }
+    .gps-info h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   </style>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -137,11 +168,14 @@
 <div class="container">
   <div class="top-section">
     <div class="video-box" id="video">
-      <img src="http://20.188.119.44:8081/?action=stream" alt="Robot Camera">
-      <div class="autopilot-overlay" id="autopilotOverlay">
-        🧠 The Autopilot mode is still under construction.<br>
-        Please take control.
-      </div>
+  <!-- ✅ Change this to MJPEG stream from your Pi -->
+        <img src="http://10.110.123.179:8081/?action=stream" alt="Robot Camera" style="width:100%; height:100%; object-fit:cover;">
+
+  <!-- 🚧 Autopilot overlay message -->
+        <div class="autopilot-overlay" id="autopilotOverlay">
+            🧠 The Autopilot mode is still under construction.<br>
+            Please take control.
+        </div>
     </div>
 
     <div class="controls-box" id="controlBox">
@@ -204,41 +238,37 @@ function toggleAutopilot() {
     ctrl.classList.add("disabled");
     btn.textContent = "TAKE CONTROL";
     btn.style.backgroundColor = "#ff9500";
-    overlay.style.display = "flex";
+    overlay.style.display = "flex"; // show overlay
   } else {
     ctrl.classList.remove("disabled");
     btn.textContent = "AUTO PILOT";
     btn.style.backgroundColor = "#cc0000";
-    overlay.style.display = "none";
+    overlay.style.display = "none"; // hide overlay
   }
   socket.emit("autopilot", autopilot);
 }
+</script>
 
-// Map setup
+<script>
 let map = L.map('map').setView([6.9271, 79.8612], 19);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(map);
 let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
 let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
-// Listen for real Pi sensor data
 socket.on("robot-data", (data) => {
-  // Temperature
   document.getElementById("temp").innerText = data.temperature;
-
-  // Human detection
   let h = document.getElementById("human");
   h.innerText = data.humanDetected;
   h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
 
-  // Gas / Air Safety
   let gasValue = data.airSafety;
   let statusEl = document.getElementById("airSafetyStatus");
   document.getElementById("airSafetyRaw").innerText = gasValue;
 
-  if (gasValue.includes("SAFE")) {
+  if (gasValue <= 300) {
     statusEl.innerText = "✅ SAFE";
     statusEl.style.color = "#00ff00";
-  } else if (gasValue.includes("WARNING")) {
+  } else if (gasValue <= 600) {
     statusEl.innerText = "⚠️ WARNING";
     statusEl.style.color = "#ffcc00";
   } else {
@@ -246,7 +276,6 @@ socket.on("robot-data", (data) => {
     statusEl.style.color = "#ff0000";
   }
 
-  // GPS
   const { lat, lng, alt } = data.gps;
   document.getElementById("lat").innerText = lat.toFixed(6);
   document.getElementById("lon").innerText = lng.toFixed(6);
@@ -257,9 +286,9 @@ socket.on("robot-data", (data) => {
   robotPath.addLatLng([lat, lng]);
 });
 </script>
+
 </body>
 </html>
-
 
 
 
