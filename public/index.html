@@ -148,7 +148,7 @@
       margin-top: 0;
       text-align: center;
     }
-    video {
+    video, img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -168,14 +168,11 @@
 <div class="container">
   <div class="top-section">
     <div class="video-box" id="video">
-  <!-- ✅ Change this to MJPEG stream from your Pi -->
-        <img src="http://10.110.123.179:8081/?action=stream" alt="Robot Camera" style="width:100%; height:100%; object-fit:cover;">
-
-  <!-- 🚧 Autopilot overlay message -->
-        <div class="autopilot-overlay" id="autopilotOverlay">
-            🧠 The Autopilot mode is still under construction.<br>
-            Please take control.
-        </div>
+      <img src="http://20.188.119.44:8081/?action=stream" alt="Robot Camera">
+      <div class="autopilot-overlay" id="autopilotOverlay">
+        🧠 Autopilot mode is still under construction.<br>
+        Please take control.
+      </div>
     </div>
 
     <div class="controls-box" id="controlBox">
@@ -238,23 +235,23 @@ function toggleAutopilot() {
     ctrl.classList.add("disabled");
     btn.textContent = "TAKE CONTROL";
     btn.style.backgroundColor = "#ff9500";
-    overlay.style.display = "flex"; // show overlay
+    overlay.style.display = "flex";
   } else {
     ctrl.classList.remove("disabled");
     btn.textContent = "AUTO PILOT";
     btn.style.backgroundColor = "#cc0000";
-    overlay.style.display = "none"; // hide overlay
+    overlay.style.display = "none";
   }
   socket.emit("autopilot", autopilot);
 }
-</script>
 
-<script>
+// Map setup
 let map = L.map('map').setView([6.9271, 79.8612], 19);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(map);
 let gpsMarker = L.marker([6.9271, 79.8612]).addTo(map);
 let robotPath = L.polyline([], {weight: 3}).addTo(map);
 
+// Listen to robot data
 socket.on("robot-data", (data) => {
   document.getElementById("temp").innerText = data.temperature;
   let h = document.getElementById("human");
@@ -265,10 +262,10 @@ socket.on("robot-data", (data) => {
   let statusEl = document.getElementById("airSafetyStatus");
   document.getElementById("airSafetyRaw").innerText = gasValue;
 
-  if (gasValue <= 300) {
+  if (gasValue === "✅ SAFE") {
     statusEl.innerText = "✅ SAFE";
     statusEl.style.color = "#00ff00";
-  } else if (gasValue <= 600) {
+  } else if (gasValue === "⚠️ WARNING") {
     statusEl.innerText = "⚠️ WARNING";
     statusEl.style.color = "#ffcc00";
   } else {
@@ -289,6 +286,7 @@ socket.on("robot-data", (data) => {
 
 </body>
 </html>
+
 
 
 
