@@ -84,6 +84,9 @@
     button:hover {
       background-color: #0e70d1;
     }
+    button:active {
+      background-color: #0a5bb5;
+    }
     .middle-section {
       display: flex;
       justify-content: space-between;
@@ -168,33 +171,67 @@
 <div class="container">
   <div class="top-section">
     <div class="video-box" id="video">
-  <!-- ✅ Change this to MJPEG stream from your Pi -->
-        <!--<img src="http://10.110.123.179:8081/?action=stream" alt="Robot Camera" style="width:100%; height:100%; object-fit:cover;">-->
-        <!--<img src="http://115.70.233.30:8080/live.html" alt="Robot Camera" style="width:100%; height:100%; object-fit:cover;">-->
-        <!-- ✅ Updated to show FFmpeg live stream -->
-        <iframe 
+      <!-- ✅ FFmpeg live stream -->
+      <iframe 
         src="http://115.70.233.30:8080/live.html" 
         style="width:100%; height:100%; border:none;" 
         allow="autoplay; fullscreen">
-        </iframe>
+      </iframe>
 
-  <!-- 🚧 Autopilot overlay message -->
-        <div class="autopilot-overlay" id="autopilotOverlay">
-            🧠 The Autopilot mode is still under construction.<br>
-            Please take control.
-        </div>
+      <!-- 🚧 Autopilot overlay message -->
+      <div class="autopilot-overlay" id="autopilotOverlay">
+        🧠 The Autopilot mode is still under construction.<br>
+        Please take control.
+      </div>
     </div>
 
     <div class="controls-box" id="controlBox">
       <h3>Robot Controls</h3>
-      <button onclick="sendCommand('forward')">Forward</button><br>
-      <button onclick="sendCommand('left')">Left</button>
-      <button onclick="sendCommand('right')">Right</button><br>
-      <button onclick="sendCommand('backward')">Backward</button>
+      <button 
+        onmousedown="sendCommand('forward')" 
+        onmouseup="sendCommand('stop')" 
+        ontouchstart="sendCommand('forward')" 
+        ontouchend="sendCommand('stop')">
+        Forward
+      </button><br>
+      <button 
+        onmousedown="sendCommand('left')" 
+        onmouseup="sendCommand('stop')" 
+        ontouchstart="sendCommand('left')" 
+        ontouchend="sendCommand('stop')">
+        Left
+      </button>
+      <button 
+        onmousedown="sendCommand('right')" 
+        onmouseup="sendCommand('stop')" 
+        ontouchstart="sendCommand('right')" 
+        ontouchend="sendCommand('stop')">
+        Right
+      </button><br>
+      <button 
+        onmousedown="sendCommand('backward')" 
+        onmouseup="sendCommand('stop')" 
+        ontouchstart="sendCommand('backward')" 
+        ontouchend="sendCommand('stop')">
+        Backward
+      </button>
 
       <h3>Camera</h3>
-      <button onclick="sendCommand('cam_up')">Up</button><br>
-      <button onclick="sendCommand('cam_down')">Down</button>
+      <button 
+        onmousedown="sendCommand('cam_up')" 
+        onmouseup="sendCommand('cam_stop')" 
+        ontouchstart="sendCommand('cam_up')" 
+        ontouchend="sendCommand('cam_stop')">
+        Up
+      </button><br>
+      <button 
+        onmousedown="sendCommand('cam_down')" 
+        onmouseup="sendCommand('cam_stop')" 
+        ontouchstart="sendCommand('cam_down')" 
+        ontouchend="sendCommand('cam_stop')">
+        Down
+      </button><br>
+      <button onclick="sendCommand('cam_center')">Center</button>
     </div>
   </div>
 
@@ -258,7 +295,7 @@ function toggleAutopilot() {
 let map = L.map('map').setView([0, 0], 19);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 }).addTo(map);
 let gpsMarker = L.marker([0, 0]).addTo(map);
-let robotPath = L.polyline([], {weight: 3}).addTo(map);
+let robotPath = L.polyline([], {color: '#1e90ff', weight: 3}).addTo(map);
 
 socket.on("robot-data", (data) => {
   document.getElementById("temp").innerText = data.temperature;
@@ -274,7 +311,7 @@ socket.on("robot-data", (data) => {
     statusEl.innerText = "✅ SAFE";
     statusEl.style.color = "#00ff00";
   } else if (gasValue <= 600) {
-    statusEl.innerText = "⚠️ WARNING";
+    statusEl.innerText = "⚠ WARNING";
     statusEl.style.color = "#ffcc00";
   } else {
     statusEl.innerText = "🔴 DANGER";
