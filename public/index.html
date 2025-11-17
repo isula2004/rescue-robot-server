@@ -297,35 +297,52 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22 
 let gpsMarker = L.marker([0, 0]).addTo(map);
 let robotPath = L.polyline([], {color: '#1e90ff', weight: 3}).addTo(map);
 
+// --- 1. EXISTING SENSOR DATA LISTENER (WITHOUT Human Detection) ---
 socket.on("robot-data", (data) => {
-  document.getElementById("temp").innerText = data.temperature;
-  let h = document.getElementById("human");
-  h.innerText = data.humanDetected;
-  h.style.color = data.humanDetected === "YES" ? "red" : "#0f0";
+    document.getElementById("temp").innerText = data.temperature;
+    
+    // NOTE: data.humanDetected is NO LONGER expected here.
+    
+    let gasValue = data.airSafety;
+    let statusEl = document.getElementById("airSafetyStatus");
+    document.getElementById("airSafetyRaw").innerText = gasValue;
 
-  let gasValue = data.airSafety;
-  let statusEl = document.getElementById("airSafetyStatus");
-  document.getElementById("airSafetyRaw").innerText = gasValue;
+    if (gasValue <= 300) {
+        statusEl.innerText = "✅ SAFE";
+        statusEl.style.color = "#00ff00";
+    } else if (gasValue <= 600) {
+        statusEl.innerText = "⚠ WARNING";
+        statusEl.style.color = "#ffcc00";
+    } else {
+        statusEl.innerText = "🔴 DANGER";
+        statusEl.style.color = "#ff0000";
+    }
 
-  if (gasValue <= 300) {
-    statusEl.innerText = "✅ SAFE";
-    statusEl.style.color = "#00ff00";
-  } else if (gasValue <= 600) {
-    statusEl.innerText = "⚠ WARNING";
-    statusEl.style.color = "#ffcc00";
-  } else {
-    statusEl.innerText = "🔴 DANGER";
-    statusEl.style.color = "#ff0000";
-  }
+    const { lat, lng, alt } = data.gps;
+    document.getElementById("lat").innerText = lat.toFixed(6);
+    document.getElementById("lon").innerText = lng.toFixed(6);
+    document.getElementById("alt").innerText = alt.toFixed(2);
 
-  const { lat, lng, alt } = data.gps;
-  document.getElementById("lat").innerText = lat.toFixed(6);
-  document.getElementById("lon").innerText = lng.toFixed(6);
-  document.getElementById("alt").innerText = alt.toFixed(2);
+    gpsMarker.setLatLng([lat, lng]);
+    map.setView([lat, lng]);
+    robotPath.addLatLng([lat, lng]);
+});
 
-  gpsMarker.setLatLng([lat, lng]);
-  map.setView([lat, lng]);
-  robotPath.addLatLng([lat, lng]);
+// --- 2. NEW HUMAN DETECTION STATUS LISTENER ---
+socket.on("human-detection-status", (status) => {
+    let h = document.getElementById("human");
+    h.innerText = status;
+    
+    // Apply styling based on the received status string
+    if (status === "YES") {
+        h.style.color = "red"; // Human detected (YES in red)
+    } else if (status === "NO") {
+        h.style.color = "#0f0"; // No human detected (NO in green)
+    } else if (status === "Disabled") {
+        h.style.color = "#ffcc00"; // Raw stream is running (Disabled in amber/yellow)
+    } else {
+        h.style.color = "#e0e0e0"; // Default or error color
+    }
 });
 </script>
 
